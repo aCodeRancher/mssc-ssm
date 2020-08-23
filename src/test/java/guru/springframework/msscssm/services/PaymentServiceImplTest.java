@@ -51,7 +51,8 @@ class PaymentServiceImplTest {
 
 
     @Transactional
-    @RepeatedTest(10)
+   // @RepeatedTest(10)
+    @Test
     void testAuth() {
         Payment savedPayment = paymentService.newPayment(payment);
 
