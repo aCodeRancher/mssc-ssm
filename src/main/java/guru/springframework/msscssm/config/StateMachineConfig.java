@@ -7,6 +7,7 @@ import guru.springframework.msscssm.domain.PaymentState;
 import guru.springframework.msscssm.config.guards.GuardsBean;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.statemachine.action.Action;
 import org.springframework.statemachine.config.EnableStateMachineFactory;
@@ -23,20 +24,25 @@ import java.util.EnumSet;
  * Created by jt on 2019-07-23.
  */
 @Slf4j
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
 @EnableStateMachineFactory
 @Configuration
 public class StateMachineConfig extends StateMachineConfigurerAdapter<PaymentState, PaymentEvent> {
 
-
-    private final Action<PaymentState, PaymentEvent> preAuthActionBean;
-    private final Action<PaymentState, PaymentEvent> preAuthApproveBean;
-    private final Action<PaymentState, PaymentEvent> preAuthDeclineBean;
-    private final Action<PaymentState, PaymentEvent> authActionBean;
-    private final Action<PaymentState, PaymentEvent> authApproveBean;
-    private final Action<PaymentState, PaymentEvent> authDeclineBean;
-
-      GuardsBean guardsBean;
+    @Autowired
+    private  Action<PaymentState, PaymentEvent> preAuthActionBean;
+    @Autowired
+    private   Action<PaymentState, PaymentEvent> preAuthApproveBean;
+    @Autowired
+    private   Action<PaymentState, PaymentEvent> preAuthDeclineBean;
+    @Autowired
+    private   Action<PaymentState, PaymentEvent> authActionBean;
+    @Autowired
+    private   Action<PaymentState, PaymentEvent> authApproveBean;
+    @Autowired
+    private   Action<PaymentState, PaymentEvent> authDeclineBean;
+    @Autowired
+    private   GuardsBean guardsBean;
 
     @Override
     public void configure(StateMachineStateConfigurer<PaymentState, PaymentEvent> states) throws Exception {
@@ -54,20 +60,20 @@ public class StateMachineConfig extends StateMachineConfigurerAdapter<PaymentSta
                     .action(preAuthActionBean).guard(guardsBean.paymentIdGuard())
                 .and()
                 .withExternal().source(PaymentState.NEW).target(PaymentState.PRE_AUTH).event(PaymentEvent.PRE_AUTH_APPROVED)
-                    .action(preAuthApproveBean).guard(guardsBean.paymentIdGuard())
+                    .action(preAuthApproveBean)
                 .and()
                 .withExternal().source(PaymentState.NEW).target(PaymentState.PRE_AUTH_ERROR).event(PaymentEvent.PRE_AUTH_DECLINED)
-                   .action(preAuthDeclineBean).guard(guardsBean.paymentIdGuard())
+                   .action(preAuthDeclineBean)
                 //preauth to auth
                 .and()
                 .withExternal().source(PaymentState.PRE_AUTH).target(PaymentState.PRE_AUTH).event(PaymentEvent.AUTHORIZE)
-                    .action(authActionBean).guard(guardsBean.paymentIdGuard())
+                    .action(authActionBean)
                 .and()
                 .withExternal().source(PaymentState.PRE_AUTH).target(PaymentState.AUTH).event(PaymentEvent.AUTH_APPROVED)
-                 .action(authApproveBean).guard(guardsBean.paymentIdGuard())
+                 .action(authApproveBean)
                 .and()
                 .withExternal().source(PaymentState.PRE_AUTH).target(PaymentState.AUTH_ERROR).event(PaymentEvent.AUTH_DECLINED)
-                 .action(authDeclineBean).guard(guardsBean.paymentIdGuard());
+                 .action(authDeclineBean);
     }
 
     @Override
